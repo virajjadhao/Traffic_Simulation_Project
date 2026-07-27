@@ -27,3 +27,11 @@ class SimulationStatus(str, Enum):
     RUNNING = "running"
     PAUSED = "paused"
     COMPLETED = "completed"
+
+
+class TurnIntent(str, Enum):
+    """Enumeration of turn intents at the intersection."""
+
+    LEFT = "left"
+    STRAIGHT = "straight"
+    RIGHT = "right"
