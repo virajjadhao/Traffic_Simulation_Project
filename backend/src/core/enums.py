@@ -18,3 +18,12 @@ class VehicleState(str, Enum):
     CROSSING = "crossing"
     IN_ROUNDABOUT = "in_roundabout"
     EXITED = "exited"
+
+
+class SimulationStatus(str, Enum):
+    """Enumeration of simulation lifecycle states."""
+
+    INITIALIZED = "initialized"
+    RUNNING = "running"
+    PAUSED = "paused"
+    COMPLETED = "completed"
