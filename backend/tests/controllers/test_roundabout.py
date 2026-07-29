@@ -63,6 +63,12 @@ def test_roundabout_validation() -> None:
     with pytest.raises(ValueError, match="entry_speed must be positive"):
         RoundaboutController(entry_speed=-1.0)
 
+    # Invalid circulating_speed
+    with pytest.raises(ValueError, match="circulating_speed must be in"):
+        RoundaboutController(circulating_speed=0.0)
+    with pytest.raises(ValueError, match="circulating_speed must be in"):
+        RoundaboutController(circulating_speed=20.0)
+
 
 def test_roundabout_yield_logic() -> None:
     # R_inner=10, R_outer=20. Avg R = 15.0.

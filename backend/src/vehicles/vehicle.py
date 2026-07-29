@@ -1,5 +1,5 @@
 import math
-from typing import TYPE_CHECKING, List, Tuple
+from typing import TYPE_CHECKING, List, Optional, Tuple
 
 from src.core.enums import VehicleState
 from src.roads.lane import Lane
@@ -68,6 +68,11 @@ class Vehicle:
         self._stop_count: int = 0
         self._is_stopped: bool = False
 
+        # Override properties for control strategies (e.g. roundabout)
+        self._coords_override: Optional[Tuple[float, float]] = None
+        self._heading_override: Optional[float] = None
+        self._speed_limit_override: Optional[float] = None
+
         # Add vehicle to initial lane
         self.lane.add_vehicle(self)
 
@@ -97,6 +102,8 @@ class Vehicle:
     @property
     def desired_speed(self) -> float:
         """Get the vehicle's desired speed."""
+        if self._speed_limit_override is not None:
+            return self._speed_limit_override
         return self._desired_speed
 
     @property
@@ -152,6 +159,8 @@ class Vehicle:
     @property
     def coords(self) -> Tuple[float, float]:
         """Get the (x, y) coordinates of the vehicle center."""
+        if self._coords_override is not None:
+            return self._coords_override
         if self._state == VehicleState.EXITED:
             # Return end coords of last lane if exited
             return self._route[-1].end_coords
@@ -170,6 +179,8 @@ class Vehicle:
     @property
     def heading(self) -> float:
         """Get the heading angle of the vehicle in degrees."""
+        if self._heading_override is not None:
+            return self._heading_override
         if self._state == VehicleState.EXITED:
             return self._route[-1].heading
         return self.lane.heading
@@ -205,6 +216,36 @@ class Vehicle:
         rl = (cx - half_l * fx - half_w * rx, cy - half_l * fy - half_w * ry)
 
         return [fl, fr, rr, rl]
+
+    @property
+    def coords_override(self) -> Optional[Tuple[float, float]]:
+        """Get the coordinate override tuple."""
+        return self._coords_override
+
+    @coords_override.setter
+    def coords_override(self, val: Optional[Tuple[float, float]]) -> None:
+        """Set the coordinate override tuple."""
+        self._coords_override = val
+
+    @property
+    def heading_override(self) -> Optional[float]:
+        """Get the heading override angle in degrees."""
+        return self._heading_override
+
+    @heading_override.setter
+    def heading_override(self, val: Optional[float]) -> None:
+        """Set the heading override angle in degrees."""
+        self._heading_override = val
+
+    @property
+    def speed_limit_override(self) -> Optional[float]:
+        """Get the speed limit override in m/s."""
+        return self._speed_limit_override
+
+    @speed_limit_override.setter
+    def speed_limit_override(self, val: Optional[float]) -> None:
+        """Set the speed limit override in m/s."""
+        self._speed_limit_override = val
 
     def update_state(
         self,

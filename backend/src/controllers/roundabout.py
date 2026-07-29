@@ -17,6 +17,7 @@ class RoundaboutController(BaseController):
         critical_gap: float = 4.0,
         follow_up_time: float = 2.5,
         entry_speed: float = 5.0,
+        circulating_speed: float = 8.0,
     ) -> None:
         """Initialize the RoundaboutController.
 
@@ -43,6 +44,8 @@ class RoundaboutController(BaseController):
             raise ValueError("follow_up_time must be positive.")
         if entry_speed <= 0:
             raise ValueError("entry_speed must be positive.")
+        if circulating_speed <= 0 or circulating_speed > 15:
+            raise ValueError("circulating_speed must be in (0, 15].")
 
         self._inner_radius = inner_radius
         self._outer_radius = outer_radius
@@ -50,6 +53,7 @@ class RoundaboutController(BaseController):
         self._critical_gap = critical_gap
         self._follow_up_time = follow_up_time
         self._entry_speed = entry_speed
+        self._circulating_speed = circulating_speed
 
         self._time_elapsed = 0.0
         self._circulating_count = 0
@@ -72,6 +76,55 @@ class RoundaboutController(BaseController):
             return
 
         self._time_elapsed += delta_time
+
+        # Update vehicle overrides and states first
+        for v in active_vehicles:
+            if v.current_lane_index == 1:
+                v.state = VehicleState.IN_ROUNDABOUT
+
+                # Check if it's a real vehicle with route and position
+                if hasattr(v, "route") and hasattr(v, "position"):
+                    # Circulating coordinates override
+                    conn_lane = v.route[1]
+                    l_conn = conn_lane.length
+                    p = max(0.0, min(1.0, v.position / l_conn))
+
+                    start_x, start_y = conn_lane.start_coords
+                    end_x, end_y = conn_lane.end_coords
+
+                    theta_start = math.atan2(start_y, start_x)
+                    theta_end = math.atan2(end_y, end_x)
+
+                    # Traffic in roundabout moves counter-clockwise (increasing angle)
+                    delta_theta = (theta_end - theta_start) % (2 * math.pi)
+                    theta = theta_start + p * delta_theta
+
+                    r_start = math.sqrt(start_x**2 + start_y**2)
+                    r_end = math.sqrt(end_x**2 + end_y**2)
+                    r = r_start + p * (r_end - r_start)
+
+                    x = r * math.cos(theta)
+                    y = r * math.sin(theta)
+
+                    v.coords_override = (x, y)
+
+                    # Heading override (circular tangent heading)
+                    dx = -math.sin(theta)
+                    dy = math.cos(theta)
+                    v.heading_override = math.degrees(math.atan2(dx, dy)) % 360.0
+
+                    # Speed limit override
+                    v.speed_limit_override = self._circulating_speed
+            else:
+                # Clear overrides for vehicles not in the roundabout circle
+                if hasattr(v, "coords_override"):
+                    v.coords_override = None
+                if hasattr(v, "heading_override"):
+                    v.heading_override = None
+                if hasattr(v, "speed_limit_override"):
+                    v.speed_limit_override = None
+                if v.state == VehicleState.IN_ROUNDABOUT:
+                    v.state = VehicleState.APPROACHING
 
         # Identify circulating vehicles:
         # Currently on connection lane (index 1) or state is IN_ROUNDABOUT

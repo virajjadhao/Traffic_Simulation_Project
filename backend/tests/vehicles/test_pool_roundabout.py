@@ -75,7 +75,10 @@ def test_pool_roundabout_yield_integration() -> None:
 
     # Force update its coords to conflict zone (10.606, 10.606)
     # We do a mock override since updating kinematics is route-bound
-    object.__setattr__(v_circ, "_position", 102.0)  # connection lane
+    v_circ.route[0].remove_vehicle(v_circ)
+    object.__setattr__(v_circ, "_current_lane_index", 1)
+    object.__setattr__(v_circ, "_position", 2.0)  # connection lane
+    v_circ.route[1].add_vehicle(v_circ)
     v_circ.state = VehicleState.IN_ROUNDABOUT
 
     from unittest.mock import patch
