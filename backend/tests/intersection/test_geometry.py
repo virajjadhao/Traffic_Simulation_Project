@@ -1,4 +1,5 @@
 import pytest
+
 from src.intersection.geometry import IntersectionGeometry
 
 

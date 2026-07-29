@@ -9,11 +9,13 @@ def test_clock_initialization() -> None:
     assert clock.get_tick_count() == 0
     assert clock.get_elapsed_time() == 0.0
 
+
 def test_clock_invalid_initialization() -> None:
     with pytest.raises(ValueError, match="Time step must be positive and non-zero"):
         Clock(0.0)
     with pytest.raises(ValueError, match="Time step must be positive and non-zero"):
         Clock(-0.5)
+
 
 def test_clock_tick() -> None:
     clock = Clock(0.1)
@@ -24,6 +26,7 @@ def test_clock_tick() -> None:
     assert clock.get_tick_count() == 2
     assert pytest.approx(clock.get_elapsed_time()) == 0.2
 
+
 def test_clock_reset() -> None:
     clock = Clock(0.2)
     clock.tick()
@@ -32,6 +35,7 @@ def test_clock_reset() -> None:
     clock.reset()
     assert clock.get_tick_count() == 0
     assert clock.get_elapsed_time() == 0.0
+
 
 def test_clock_seconds_to_ticks() -> None:
     clock = Clock(0.1)
@@ -42,6 +46,7 @@ def test_clock_seconds_to_ticks() -> None:
 
     with pytest.raises(ValueError, match="Seconds cannot be negative"):
         clock.seconds_to_ticks(-0.1)
+
 
 def test_clock_ticks_to_seconds() -> None:
     clock = Clock(0.1)

@@ -87,9 +87,7 @@ def test_spawner_safety_headway(network: RoadNetwork) -> None:
         arrival_rate=100.0,
         total_vehicles=10,
         random_seed=42,
-        directional_split={
-            "north": 1.0, "south": 0.0, "east": 0.0, "west": 0.0
-        },
+        directional_split={"north": 1.0, "south": 0.0, "east": 0.0, "west": 0.0},
     )
 
     # Spawn first vehicle (use large elapsed time to ensure past interval)

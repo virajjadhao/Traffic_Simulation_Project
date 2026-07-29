@@ -9,11 +9,13 @@ def test_idm_initialization() -> None:
     assert idm._max_acceleration == 2.5
     assert idm._comfort_deceleration == 3.5
 
+
 def test_idm_invalid_initialization() -> None:
     with pytest.raises(ValueError, match="must be positive"):
         IntelligentDriverModel(max_acceleration=0.0)
     with pytest.raises(ValueError, match="must be positive"):
         IntelligentDriverModel(comfort_deceleration=-1.0)
+
 
 def test_idm_free_flow() -> None:
     idm = IntelligentDriverModel(
@@ -29,6 +31,7 @@ def test_idm_free_flow() -> None:
 
     # Overspeed (v > v0) -> acceleration should be negative
     assert idm.calculate_acceleration(speed=12.0, desired_speed=10.0) < 0.0
+
 
 def test_idm_following() -> None:
     idm = IntelligentDriverModel(
@@ -52,12 +55,13 @@ def test_idm_following() -> None:
         speed=10.0, desired_speed=15.0, lead_speed=0.0, gap=5.0
     )
     assert acc_braking < 0.0
-    
+
     # Check max deceleration capping
     acc_extreme = idm.calculate_acceleration(
         speed=30.0, desired_speed=15.0, lead_speed=0.0, gap=1.0
     )
     assert acc_extreme == -9.0  # Capped at max_deceleration
+
 
 def test_idm_collision_gap() -> None:
     idm = IntelligentDriverModel(max_deceleration=9.0)
@@ -70,6 +74,7 @@ def test_idm_collision_gap() -> None:
     )
     assert acc_zero == -9.0
     assert acc_neg == -9.0
+
 
 def test_idm_invalid_arguments() -> None:
     idm = IntelligentDriverModel()

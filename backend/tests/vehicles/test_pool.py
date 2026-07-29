@@ -1,4 +1,3 @@
-
 from src.core.enums import Direction, TurnIntent
 from src.intersection.conflict_zones import ConflictZoneDetector
 from src.roads.network import RoadNetwork
@@ -118,9 +117,7 @@ def test_pool_traffic_signal_integration() -> None:
         arrival_rate=100.0,
         total_vehicles=1,
         random_seed=42,
-        directional_split={
-            "north": 1.0, "south": 0.0, "east": 0.0, "west": 0.0
-        },
+        directional_split={"north": 1.0, "south": 0.0, "east": 0.0, "west": 0.0},
     )
     idm = IntelligentDriverModel(max_acceleration=2.0)
     signals = {

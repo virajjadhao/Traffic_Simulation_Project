@@ -11,6 +11,7 @@ def sample_route() -> list[Lane]:
     lane_2 = Lane("lane_2", 0.0, 100.0, 100.0, 100.0)  # Length 100
     return [lane_1, lane_2]
 
+
 def test_vehicle_initialization(sample_route: list[Lane]) -> None:
     v = Vehicle("v1", length=4.5, width=2.0, desired_speed=15.0, route=sample_route)
     assert v.vehicle_id == "v1"
@@ -26,6 +27,7 @@ def test_vehicle_initialization(sample_route: list[Lane]) -> None:
     assert v.wait_time == 0.0
     assert v.stop_count == 1  # starts stopped
 
+
 def test_vehicle_invalid_initialization(sample_route: list[Lane]) -> None:
     # Empty route
     with pytest.raises(ValueError, match="Vehicle route cannot be empty"):
@@ -37,6 +39,7 @@ def test_vehicle_invalid_initialization(sample_route: list[Lane]) -> None:
         Vehicle("v1", 4.5, 2.0, -1.0, sample_route)
     with pytest.raises(ValueError, match="Initial speed cannot be negative"):
         Vehicle("v1", 4.5, 2.0, 15.0, sample_route, initial_speed=-1.0)
+
 
 def test_vehicle_kinematics(sample_route: list[Lane]) -> None:
     v = Vehicle("v1", 4.5, 2.0, 15.0, sample_route, initial_speed=10.0)
@@ -54,13 +57,19 @@ def test_vehicle_kinematics(sample_route: list[Lane]) -> None:
     assert v.stop_count == 1
     assert v.state == VehicleState.WAITING
 
+
 def test_vehicle_lane_transition(sample_route: list[Lane]) -> None:
     v = Vehicle(
-        "v1", length=4.5, width=2.0, desired_speed=15.0, route=sample_route,
-        start_position=90.0, initial_speed=20.0
+        "v1",
+        length=4.5,
+        width=2.0,
+        desired_speed=15.0,
+        route=sample_route,
+        start_position=90.0,
+        initial_speed=20.0,
     )
     assert v.lane == sample_route[0]
-    
+
     # Moves 10 meters, transitions to lane_2
     v.update_state(acceleration=0.0, dt=0.6)
     # Position: 90 + 20*0.6 = 102. 102 - 100 = 2 meters on lane_2.
@@ -74,14 +83,15 @@ def test_vehicle_lane_transition(sample_route: list[Lane]) -> None:
     assert v.lane_id == ""
     assert v.speed == 0.0
 
+
 def test_vehicle_bounding_box(sample_route: list[Lane]) -> None:
     v = Vehicle("v1", length=4.0, width=2.0, desired_speed=15.0, route=sample_route)
     # Center is at (0, 0)
     assert v.coords == (0.0, 0.0)
     assert v.heading == 0.0  # Heading of lane_1 (facing North)
-    
+
     corners = v.get_bounding_box()
-    # Facing North (positive Y): 
+    # Facing North (positive Y):
     # Front-Left: center + L/2 along heading - W/2 perp right
     # Heading vector: (0, 1). Right vector: (1, 0)
     # FL: (0 - 1.0, 0 + 2.0) = (-1.0, 2.0)
