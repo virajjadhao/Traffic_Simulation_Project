@@ -1,9 +1,11 @@
 
-from src.core.enums import Direction
+from src.core.enums import Direction, TurnIntent
+from src.intersection.conflict_zones import ConflictZoneDetector
 from src.roads.network import RoadNetwork
 from src.vehicles.idm import IntelligentDriverModel
 from src.vehicles.pool import VehiclePool
 from src.vehicles.spawner import VehicleSpawner
+from src.vehicles.vehicle import Vehicle
 
 
 def _make_network() -> RoadNetwork:
@@ -143,3 +145,48 @@ def test_pool_traffic_signal_integration() -> None:
         vehicle = pool.active_vehicles[0]
         # At red light, vehicle should have low speed near stop line
         assert vehicle.speed < 1.0
+
+
+def test_pool_conflict_integration() -> None:
+    """Verify that conflicting vehicles decelerate in the update loop."""
+    network = _make_network()
+    # Mock spawner that doesn't spawn anything automatically
+    spawner = VehicleSpawner(network, arrival_rate=1.0, total_vehicles=1)
+    spawner.try_spawn = lambda t: None  # type: ignore[assignment]
+    idm = IntelligentDriverModel(max_acceleration=2.0, comfort_deceleration=3.0)
+
+    detector = ConflictZoneDetector(safety_buffer=2.0)
+    pool = VehiclePool(spawner, idm, conflict_detector=detector)
+
+    route_ns = network.generate_route(Direction.NORTH, 0, TurnIntent.STRAIGHT)
+    route_we = network.generate_route(Direction.WEST, 0, TurnIntent.STRAIGHT)
+
+    v_ns = Vehicle(
+        "v_ns",
+        length=4.0,
+        width=2.0,
+        desired_speed=10.0,
+        route=route_ns,
+        start_position=90.0,
+        initial_speed=10.0,
+    )
+    v_we = Vehicle(
+        "v_we",
+        length=4.0,
+        width=2.0,
+        desired_speed=10.0,
+        route=route_we,
+        start_position=95.0,
+        initial_speed=10.0,
+    )
+
+    # Manually insert them into the pool
+    pool._active.extend([v_ns, v_we])
+
+    # Update pool by one tick
+    pool.update(dt=0.1, elapsed_time=0.1)
+
+    # v_we is closer to P, so it should continue moving/accelerating
+    # v_ns should detect conflict and decelerate
+    assert v_ns.acceleration < 0.0
+    assert v_we.acceleration >= 0.0

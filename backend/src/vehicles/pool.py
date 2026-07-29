@@ -1,6 +1,7 @@
 from typing import Dict, List, Optional
 
 from src.core.enums import Direction, VehicleState
+from src.intersection.conflict_zones import ConflictZoneDetector
 from src.vehicles.idm import IntelligentDriverModel
 from src.vehicles.router import find_leader
 from src.vehicles.spawner import VehicleSpawner
@@ -15,6 +16,7 @@ class VehiclePool:
         spawner: VehicleSpawner,
         idm: IntelligentDriverModel,
         traffic_signals: Optional[Dict[Direction, bool]] = None,
+        conflict_detector: Optional[ConflictZoneDetector] = None,
     ) -> None:
         """Initialize the VehiclePool.
 
@@ -22,10 +24,14 @@ class VehiclePool:
             spawner: The vehicle spawner instance.
             idm: The Intelligent Driver Model for acceleration.
             traffic_signals: Optional signal state map (True=green).
+            conflict_detector: Optional conflict zone safety detector.
         """
         self._spawner: VehicleSpawner = spawner
         self._idm: IntelligentDriverModel = idm
         self._traffic_signals: Optional[Dict[Direction, bool]] = traffic_signals
+        self._conflict_detector: ConflictZoneDetector = (
+            conflict_detector or ConflictZoneDetector()
+        )
         self._active: List[Vehicle] = []
         self._exited: List[Vehicle] = []
 
@@ -54,12 +60,28 @@ class VehiclePool:
             leader, gap = find_leader(vehicle, self._traffic_signals)
             lead_speed = leader.speed if leader is not None else None
             gap_val = gap if leader is not None else None
-            acceleration = self._idm.calculate_acceleration(
+            acc_lane = self._idm.calculate_acceleration(
                 speed=vehicle.speed,
                 desired_speed=vehicle.desired_speed,
                 lead_speed=lead_speed,
                 gap=gap_val,
             )
+
+            # Check for crossing conflict constraints
+            conflict_gap = self._conflict_detector.check_conflicts(
+                vehicle, self._active
+            )
+            if conflict_gap < float("inf"):
+                acc_conflict = self._idm.calculate_acceleration(
+                    speed=vehicle.speed,
+                    desired_speed=vehicle.desired_speed,
+                    lead_speed=0.0,  # Treat as stationary virtual obstacle
+                    gap=conflict_gap,
+                )
+                acceleration = min(acc_lane, acc_conflict)
+            else:
+                acceleration = acc_lane
+
             vehicle.update_state(acceleration, dt)
 
         # 4. Cleanup exited vehicles
@@ -72,7 +94,8 @@ class VehiclePool:
         self._active = still_active
 
     def set_traffic_signals(
-        self, signals: Dict[Direction, bool],
+        self,
+        signals: Dict[Direction, bool],
     ) -> None:
         """Update the traffic signal state map.
 
