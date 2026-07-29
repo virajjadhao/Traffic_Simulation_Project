@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, List, Tuple
 if TYPE_CHECKING:
     from src.vehicles.vehicle import Vehicle
 
+
 class Lane:
     """Represents a single lane corridor on an approach road."""
 
@@ -36,7 +37,7 @@ class Lane:
             )
         if speed_limit <= 0:
             raise ValueError("Speed limit must be greater than zero.")
-            
+
         self._lane_id: str = lane_id
         self._start_x: float = start_x
         self._start_y: float = start_y

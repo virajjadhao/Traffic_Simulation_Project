@@ -70,6 +70,7 @@ class Clock:
         if seconds < 0:
             raise ValueError("Seconds cannot be negative.")
         import math
+
         return math.floor(seconds / self._time_step + 0.5)
 
     def ticks_to_seconds(self, ticks: int) -> float:

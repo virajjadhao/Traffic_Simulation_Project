@@ -6,6 +6,7 @@ from src.roads.lane import Lane
 if TYPE_CHECKING:
     from src.vehicles.vehicle import Vehicle
 
+
 class Approach:
     """Represents an approach arm (North, South, East, West) of the intersection."""
 

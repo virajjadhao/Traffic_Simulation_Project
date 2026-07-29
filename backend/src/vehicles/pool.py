@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional
+from typing import Dict, List, Mapping, Optional
 
 from src.core.enums import Direction, VehicleState
 from src.intersection.conflict_zones import ConflictZoneDetector
@@ -15,7 +15,7 @@ class VehiclePool:
         self,
         spawner: VehicleSpawner,
         idm: IntelligentDriverModel,
-        traffic_signals: Optional[Dict[Direction, bool]] = None,
+        traffic_signals: Optional[Mapping[Direction, bool | str]] = None,
         conflict_detector: Optional[ConflictZoneDetector] = None,
     ) -> None:
         """Initialize the VehiclePool.
@@ -28,7 +28,9 @@ class VehiclePool:
         """
         self._spawner: VehicleSpawner = spawner
         self._idm: IntelligentDriverModel = idm
-        self._traffic_signals: Optional[Dict[Direction, bool]] = traffic_signals
+        self._traffic_signals: Optional[Mapping[Direction, bool | str]] = (
+            traffic_signals
+        )
         self._conflict_detector: ConflictZoneDetector = (
             conflict_detector or ConflictZoneDetector()
         )
@@ -95,12 +97,13 @@ class VehiclePool:
 
     def set_traffic_signals(
         self,
-        signals: Dict[Direction, bool],
+        signals: Mapping[Direction, bool | str],
     ) -> None:
         """Update the traffic signal state map.
 
         Args:
-            signals: Dict mapping Direction to green (True) or red (False).
+            signals: Dict mapping Direction to green (True/"green") or red
+                (False/"red").
         """
         self._traffic_signals = signals
 

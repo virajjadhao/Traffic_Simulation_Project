@@ -111,3 +111,37 @@ def test_find_leader_cross_lane(sample_network: RoadNetwork) -> None:
     # Position on connection lane: v_lead.position - v_lead.length/2.0
     expected_gap = (96.5 - 82.0) + (v_lead.position - 2.0)
     assert pytest.approx(gap) == expected_gap
+
+
+def test_find_leader_colors(sample_network: RoadNetwork) -> None:
+    route = sample_network.generate_route(
+        Direction.NORTH, lane_index=0, turn_intent=TurnIntent.STRAIGHT
+    )
+    v_follow = Vehicle(
+        "follow",
+        length=4.0,
+        width=2.0,
+        desired_speed=10.0,
+        route=route,
+        start_position=80.0,
+    )
+
+    # test color "green" -> no obstacle
+    signals = {Direction.NORTH: "green"}
+    leader, gap = find_leader(v_follow, traffic_signals=signals)
+    assert leader is None
+    assert gap == float("inf")
+
+    # test color "yellow" -> stop line virtual leader
+    signals = {Direction.NORTH: "yellow"}
+    leader, gap = find_leader(v_follow, traffic_signals=signals)
+    assert isinstance(leader, VirtualVehicle)
+    assert leader.vehicle_id == "stop_line_north"
+    assert pytest.approx(gap) == 14.5
+
+    # test color "red" -> stop line virtual leader
+    signals = {Direction.NORTH: "red"}
+    leader, gap = find_leader(v_follow, traffic_signals=signals)
+    assert isinstance(leader, VirtualVehicle)
+    assert leader.vehicle_id == "stop_line_north"
+    assert pytest.approx(gap) == 14.5

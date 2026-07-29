@@ -89,23 +89,17 @@ class IntelligentDriverModel:
             delta_v = speed - lead_speed
 
             # Target gap s* = s0 + v*T + (v * delta_v) / (2 * sqrt(a * b))
-            denom = 2.0 * math.sqrt(
-                self._max_acceleration * self._comfort_deceleration
-            )
+            denom = 2.0 * math.sqrt(self._max_acceleration * self._comfort_deceleration)
             spacing_term = (speed * delta_v) / denom
 
             target_gap = (
-                self._minimum_gap
-                + speed * self._desired_time_headway
-                + spacing_term
+                self._minimum_gap + speed * self._desired_time_headway + spacing_term
             )
             # Cap target gap to be non-negative
             target_gap = max(0.0, target_gap)
 
             # Acceleration = a_free - a0 * (s* / s)^2
-            acc = acc_free - self._max_acceleration * math.pow(
-                target_gap / gap, 2
-            )
+            acc = acc_free - self._max_acceleration * math.pow(target_gap / gap, 2)
 
         # Cap deceleration at absolute physical limit
         return max(-self._max_deceleration, acc)

@@ -77,9 +77,7 @@ class VehicleSpawner:
         if total_vehicles <= 0:
             raise ValueError("Total vehicles must be positive.")
         if arrival_distribution not in ("poisson", "uniform"):
-            raise ValueError(
-                "Arrival distribution must be 'poisson' or 'uniform'."
-            )
+            raise ValueError("Arrival distribution must be 'poisson' or 'uniform'.")
         if vehicle_length <= 0 or vehicle_width <= 0:
             raise ValueError("Vehicle dimensions must be positive.")
         if desired_speed <= 0:
@@ -123,20 +121,17 @@ class VehicleSpawner:
 
     def _pick_direction(self) -> Direction:
         """Pick a random direction weighted by directional split."""
-        chosen = self._rng.choices(
-            self._dir_names, weights=self._dir_weights, k=1
-        )[0]
+        chosen = self._rng.choices(self._dir_names, weights=self._dir_weights, k=1)[0]
         return _DIR_MAP[chosen]
 
     def _pick_turn_intent(self) -> TurnIntent:
         """Pick a random turn intent weighted by probabilities."""
-        chosen = self._rng.choices(
-            self._turn_names, weights=self._turn_weights, k=1
-        )[0]
+        chosen = self._rng.choices(self._turn_names, weights=self._turn_weights, k=1)[0]
         return _TURN_MAP[chosen]
 
     def _is_lane_clear(
-        self, vehicles_on_lane: List[Vehicle],
+        self,
+        vehicles_on_lane: List[Vehicle],
     ) -> bool:
         """Check if there is enough headway at the start of a lane.
 
@@ -178,9 +173,7 @@ class VehicleSpawner:
             self._next_spawn_time = elapsed_time + self._sample_interval()
             return None
 
-        route = self._network.generate_route(
-            direction, lane_index, turn_intent
-        )
+        route = self._network.generate_route(direction, lane_index, turn_intent)
         vehicle_id = f"veh_{self._spawned_count}"
         vehicle = Vehicle(
             vehicle_id=vehicle_id,

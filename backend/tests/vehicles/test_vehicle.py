@@ -55,7 +55,7 @@ def test_vehicle_kinematics(sample_route: list[Lane]) -> None:
     v.update_state(acceleration=-24.0, dt=0.5)  # decelerates to 0
     assert v.speed == 0.0
     assert v.stop_count == 1
-    assert v.state == VehicleState.WAITING
+    assert v.state == VehicleState.WAITING  # type: ignore[comparison-overlap]
 
 
 def test_vehicle_lane_transition(sample_route: list[Lane]) -> None:
@@ -79,7 +79,7 @@ def test_vehicle_lane_transition(sample_route: list[Lane]) -> None:
 
     # Move past the end of route (exited)
     v.update_state(acceleration=0.0, dt=10.0)
-    assert v.state == VehicleState.EXITED
+    assert v.state == VehicleState.EXITED  # type: ignore[comparison-overlap]
     assert v.lane_id == ""
     assert v.speed == 0.0
 

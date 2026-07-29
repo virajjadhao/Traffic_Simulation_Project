@@ -8,6 +8,7 @@ if TYPE_CHECKING:
     # Avoid circular imports at runtime
     pass
 
+
 class Vehicle:
     """Represents a vehicle moving along a lane corridor path in the simulation."""
 
@@ -52,29 +53,29 @@ class Vehicle:
         self._width: float = width
         self._desired_speed: float = desired_speed
         self._route: List[Lane] = list(route)
-        
+
         # Route tracking
         self._current_lane_index: int = 0
         self._position: float = start_position
-        
+
         # Kinematics
         self._speed: float = initial_speed
         self._acceleration: float = 0.0
-        
+
         # Telemetry and state tracking
         self._state: VehicleState = VehicleState.APPROACHING
         self._cumulative_wait_time: float = 0.0
         self._stop_count: int = 0
         self._is_stopped: bool = False
-        
+
         # Add vehicle to initial lane
         self.lane.add_vehicle(self)
-        
+
         # Perform initial state-based stop check
         if self._speed < 0.1:  # default stopSpeedThreshold
             self._is_stopped = True
             self._stop_count = 1
-            
+
         if self._speed < 0.5:  # default waitSpeedThreshold
             self._state = VehicleState.WAITING
 

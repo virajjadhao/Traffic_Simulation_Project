@@ -1,4 +1,4 @@
-from typing import Dict, Optional, Tuple
+from typing import Mapping, Optional, Tuple
 
 from src.core.enums import Direction, VehicleState
 from src.roads.lane import Lane
@@ -24,14 +24,14 @@ class VirtualVehicle:
 
 def find_leader(
     vehicle: Vehicle,
-    traffic_signals: Optional[Dict[Direction, bool]] = None,
+    traffic_signals: Optional[Mapping[Direction, bool | str]] = None,
 ) -> Tuple[Optional[Vehicle | VirtualVehicle], float]:
     """Find the leading vehicle or obstacle in front of the vehicle along its route.
 
     Args:
         vehicle: The subject vehicle.
-        traffic_signals: Dict mapping Direction to a boolean indicating if green
-          (True=green, False=red).
+        traffic_signals: Dict mapping Direction to a boolean (True=green) or
+          string color ("green"/"yellow"/"red") indicating signal state.
 
     Returns:
         A tuple of (leading_vehicle_or_obstacle, gap_distance).
@@ -60,9 +60,9 @@ def find_leader(
 
     if same_lane_leader is not None:
         # Gap is distance between front of subject and rear of leader
-        gap = (
-            same_lane_leader.position - same_lane_leader.length / 2.0
-        ) - (vehicle.position + vehicle.length / 2.0)
+        gap = (same_lane_leader.position - same_lane_leader.length / 2.0) - (
+            vehicle.position + vehicle.length / 2.0
+        )
         return same_lane_leader, max(0.0, gap)
 
     # 2. If no leader in current lane, check traffic signals stop lines
@@ -80,9 +80,10 @@ def find_leader(
         direction = dir_map.get(incoming_direction)
 
         if direction is not None and traffic_signals is not None:
-            is_green = traffic_signals.get(direction, True)
+            sig_val = traffic_signals.get(direction, True)
+            is_green = sig_val if isinstance(sig_val, bool) else (sig_val == "green")
             if not is_green:
-                # Signal is RED: place a virtual leader at the end of incoming lane
+                # Signal is RED/YELLOW: place virtual leader at end of incoming lane
                 stop_line_pos = current_lane.length
                 gap = stop_line_pos - (vehicle.position + vehicle.length / 2.0)
                 virtual_leader = VirtualVehicle(
@@ -93,9 +94,7 @@ def find_leader(
                 return virtual_leader, max(0.0, gap)
 
     # 3. Look ahead into subsequent lanes in the route
-    accumulated_gap = current_lane.length - (
-        vehicle.position + vehicle.length / 2.0
-    )
+    accumulated_gap = current_lane.length - (vehicle.position + vehicle.length / 2.0)
 
     for next_lane_idx in range(current_lane_idx + 1, len(route)):
         next_lane = route[next_lane_idx]
