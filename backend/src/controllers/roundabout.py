@@ -2,10 +2,12 @@ import math
 from typing import Any, Dict, List
 
 from src.controllers.base import BaseController
+from src.controllers.registry import register_controller
 from src.core.enums import Direction, VehicleState
 from src.vehicles.vehicle import Vehicle
 
 
+@register_controller("roundabout")
 class RoundaboutController(BaseController):
     """Modern roundabout intersection controller strategy."""
 

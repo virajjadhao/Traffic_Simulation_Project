@@ -1,9 +1,11 @@
 from typing import Any, Dict, List, Optional
 
 from src.controllers.base import BaseController
+from src.controllers.registry import register_controller
 from src.vehicles.vehicle import Vehicle
 
 
+@register_controller("fixed_time_signal")
 class FixedTimeSignalController(BaseController):
     """Fixed-time traffic signal controller strategy."""
 
