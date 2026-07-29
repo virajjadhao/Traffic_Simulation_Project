@@ -25,6 +25,9 @@ jobs:
   backend-lint-test:
     name: Backend CI
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -34,41 +37,26 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install Linting Tools
+      - name: Install Linting & Testing Tools
         run: |
           python -m pip install --upgrade pip
           pip install ruff mypy pytest pytest-cov
 
       - name: Run Ruff Linter
-        run: |
-          if [ -f "backend/pyproject.toml" ]; then
-            ruff check backend/
-          else
-            echo "Warning: backend/pyproject.toml not found. Skipping strict linter checks."
-          fi
+        run: ruff check src/ tests/
 
       - name: Run MyPy Type Checker
-        run: |
-          if [ -d "backend/src" ]; then
-            mypy backend/src/
-          else
-            echo "No source directory in backend/src. Skipping type checks."
-          fi
+        run: mypy src/
 
       - name: Run Backend Tests
-        run: |
-          if [ -f "backend/requirements.txt" ]; then
-            pip install -r backend/requirements.txt
-          fi
-          if [ -d "backend/tests" ]; then
-            pytest backend/tests/
-          else
-            echo "No tests found in backend/tests."
-          fi
+        run: pytest
 
   frontend-lint-test:
     name: Frontend CI
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -79,23 +67,21 @@ jobs:
           node-version: "18"
 
       - name: Install Dependencies
-        run: |
-          if [ -f "frontend/package.json" ]; then
-            cd frontend && npm ci
-          fi
+        run: npm ci
 
       - name: Run ESLint
-        run: |
-          if [ -f "frontend/eslint.config.js" ]; then
-            cd frontend && npm run lint
-          else
-            echo "ESLint config not found. Skipping lint checks."
-          fi
+        run: npm run lint
 
-      - name: Run Vitest
-        run: |
-          if [ -f "frontend/package.json" ] && grep -q '"test"' frontend/package.json; then
-            cd frontend && npm test -- --run
-          else
-            echo "No test runner configured in frontend/package.json. Skipping."
-          fi
+      - name: Run TypeScript Type Checker
+        run: npm run type-check
+
+      - name: Run Prettier Format Checker
+        run: npm run format
+
+  build-and-test:
+    name: build-and-test
+    needs: [validate-schemas, backend-lint-test, frontend-lint-test]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Success
+        run: echo "All validation, backend, and frontend checks passed!"
