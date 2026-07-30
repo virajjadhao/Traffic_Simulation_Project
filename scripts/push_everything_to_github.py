@@ -450,7 +450,20 @@ def setup_issues(repo_url, milestone_mapping, dry_run=False):
             print(f"  [dry-run] Would create issue: {gh_title}")
             continue
 
+        # Determine assignees
+        assignees = []
+        raw_assignee = issue.get("suggested_assignee", "").strip().lower()
+        if "backend" in raw_assignee:
+            assignees.append("virajjadhao")
+        elif "frontend" in raw_assignee:
+            assignees.append("khushikashyap-sas")
+        elif "both" in raw_assignee or "shared" in raw_assignee:
+            assignees.append("virajjadhao")
+            assignees.append("khushikashyap-sas")
+
         data = {"title": gh_title, "body": full_body, "labels": issue["labels"]}
+        if assignees:
+            data["assignees"] = assignees
         if m_number:
             data["milestone"] = m_number
 
