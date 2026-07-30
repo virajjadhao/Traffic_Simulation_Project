@@ -1,5 +1,7 @@
+import { MainLayout } from './layouts';
+
 function App() {
-  return <h1>Hello Khushi! 🚀</h1>;
+  return <MainLayout />;
 }
 
 export default App;
