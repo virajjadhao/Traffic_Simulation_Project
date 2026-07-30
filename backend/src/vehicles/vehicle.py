@@ -300,7 +300,7 @@ class Vehicle:
             if not self._is_stopped:
                 self._stop_count += 1
                 self._is_stopped = True
-        else:
+        elif self._speed >= 2 * stop_speed_threshold:
             self._is_stopped = False
 
         if self._speed < wait_speed_threshold:
