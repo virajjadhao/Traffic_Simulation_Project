@@ -1,9 +1,7 @@
+import { MainLayout } from './layouts';
+
 export function App() {
-  return (
-    <div>
-      <h1>Traffic Simulation Dashboard</h1>
-    </div>
-  )
+  return <MainLayout />;
 }
 
-export default App
+export default App;

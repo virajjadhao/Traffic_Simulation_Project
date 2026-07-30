@@ -1,0 +1,214 @@
+.main {
+  flex: 1;
+  min-width: 0;
+  overflow-y: auto;
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--panel-gap);
+}
+
+.welcome h2 {
+  font-size: var(--font-size-2xl);
+  margin-bottom: var(--space-2);
+}
+
+.welcomeText {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr min(22rem, 35%);
+  gap: var(--panel-gap);
+  flex: 1;
+  min-height: 0;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-surface);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.panelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-4);
+  border-bottom: var(--border-width) solid var(--color-border-subtle);
+  background-color: var(--color-surface-muted);
+}
+
+.panelHeader h3 {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-secondary);
+}
+
+.panelBadge {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-xs);
+  padding: var(--space-1) var(--space-2);
+  background-color: var(--color-surface-elevated);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-muted);
+}
+
+.viewportPlaceholder {
+  flex: 1;
+  min-height: 20rem;
+  padding: var(--space-4);
+}
+
+.viewportInner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  height: 100%;
+  min-height: 18rem;
+  background-color: var(--color-road-surface);
+  border-radius: var(--radius-md);
+  border: var(--border-width) solid var(--color-border);
+  background-image:
+    radial-gradient(
+      circle at 50% 50%,
+      var(--color-simulation-grass) 0%,
+      var(--color-simulation-grass) 18%,
+      transparent 19%
+    ),
+    linear-gradient(
+      90deg,
+      var(--color-simulation-grass) 0%,
+      var(--color-simulation-grass) 22%,
+      transparent 22%,
+      transparent 78%,
+      var(--color-simulation-grass) 78%
+    ),
+    linear-gradient(
+      0deg,
+      var(--color-simulation-grass) 0%,
+      var(--color-simulation-grass) 22%,
+      transparent 22%,
+      transparent 78%,
+      var(--color-simulation-grass) 78%
+    );
+}
+
+.viewportIcon {
+  font-size: var(--font-size-3xl);
+  color: var(--color-lane-marking);
+  opacity: 0.6;
+}
+
+.placeholderText {
+  font-size: var(--font-size-sm);
+  color: var(--color-lane-marking);
+  opacity: 0.8;
+}
+
+.placeholderHint {
+  font-size: var(--font-size-xs);
+  font-family: var(--font-family-mono);
+  color: var(--color-text-muted);
+}
+
+.sidePanels {
+  display: flex;
+  flex-direction: column;
+  gap: var(--panel-gap);
+  min-width: 0;
+}
+
+.metricsPlaceholder,
+.controlsPlaceholder {
+  padding: var(--space-4);
+}
+
+.metricStubs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.metricStub {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-3);
+  background-color: var(--color-surface-muted);
+  border-radius: var(--radius-md);
+  border: var(--border-width) solid var(--color-border-subtle);
+}
+
+.metricLabel {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.metricValue {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-muted);
+}
+
+.controlRow {
+  display: flex;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.controlButton {
+  flex: 1;
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  background-color: var(--color-surface-muted);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.controlButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.controlButton:not(:disabled):hover {
+  background-color: var(--color-surface-elevated);
+  color: var(--color-text-primary);
+}
+
+@media (max-width: 1024px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .sidePanels {
+    flex-direction: row;
+  }
+
+  .sidePanels .panel {
+    flex: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .main {
+    padding: var(--space-4);
+  }
+
+  .sidePanels {
+    flex-direction: column;
+  }
+}

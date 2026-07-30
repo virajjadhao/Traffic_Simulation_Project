@@ -1,0 +1,13 @@
+@import './variables.css';
+@import './reset.css';
+@import './typography.css';
+
+:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+button:focus-visible,
+a:focus-visible {
+  border-radius: var(--radius-sm);
+}
