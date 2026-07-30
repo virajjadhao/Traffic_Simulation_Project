@@ -73,6 +73,10 @@ class Vehicle:
         self._heading_override: Optional[float] = None
         self._speed_limit_override: Optional[float] = None
 
+        # Timestamps for metric analysis
+        self._spawn_time: Optional[float] = None
+        self._exit_time: Optional[float] = None
+
         # Add vehicle to initial lane
         self.lane.add_vehicle(self)
 
@@ -246,6 +250,26 @@ class Vehicle:
     def speed_limit_override(self, val: Optional[float]) -> None:
         """Set the speed limit override in m/s."""
         self._speed_limit_override = val
+
+    @property
+    def spawn_time(self) -> Optional[float]:
+        """Get the simulation time when the vehicle was spawned."""
+        return self._spawn_time
+
+    @spawn_time.setter
+    def spawn_time(self, val: Optional[float]) -> None:
+        """Set the spawn time of the vehicle."""
+        self._spawn_time = val
+
+    @property
+    def exit_time(self) -> Optional[float]:
+        """Get the simulation time when the vehicle exited."""
+        return self._exit_time
+
+    @exit_time.setter
+    def exit_time(self, val: Optional[float]) -> None:
+        """Set the exit time of the vehicle."""
+        self._exit_time = val
 
     def update_state(
         self,

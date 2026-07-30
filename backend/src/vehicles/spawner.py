@@ -184,6 +184,7 @@ class VehicleSpawner:
             start_position=0.0,
             initial_speed=0.0,
         )
+        vehicle.spawn_time = elapsed_time
 
         self._spawned_count += 1
         self._next_spawn_time = elapsed_time + self._sample_interval()

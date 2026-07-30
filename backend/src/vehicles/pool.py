@@ -90,6 +90,7 @@ class VehiclePool:
         still_active: List[Vehicle] = []
         for vehicle in self._active:
             if vehicle.state == VehicleState.EXITED:
+                vehicle.exit_time = elapsed_time
                 self._exited.append(vehicle)
             else:
                 still_active.append(vehicle)
