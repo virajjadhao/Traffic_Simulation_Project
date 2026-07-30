@@ -1,4 +1,6 @@
 from .collector import MetricCollector
+from .definitions.fairness import calculate_directional_fairness
+from .definitions.idle_loss import IdleOpportunityLossTracker
 from .definitions.queue_length import QueueLengthTracker
 from .definitions.speed_variance import (
     calculate_active_cv,
@@ -18,4 +20,6 @@ __all__ = [
     "calculate_active_cv",
     "calculate_speed_variance_index",
     "calculate_travel_time_reliability",
+    "IdleOpportunityLossTracker",
+    "calculate_directional_fairness",
 ]
